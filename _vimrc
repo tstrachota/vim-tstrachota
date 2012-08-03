@@ -40,3 +40,10 @@ set pastetoggle=<F2>
 "pathogen plugin (enables .vim/bundle)
 call pathogen#runtime_append_all_bundles()
 
+"tagbar
+autocmd BufEnter * nested :call tagbar#autoopen(0)
+autocmd FileType rb,js,py,php,sh nested :TagbarOpen
+let g:tagbar_width = 40
+
+
+
