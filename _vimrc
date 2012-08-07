@@ -16,6 +16,20 @@ hi CursorLine cterm=NONE ctermbg=gray
 map + :tabn<CR>
 map - :tabp<CR>
 
+"<Esc> and then <num> switches to the nth tab
+map <Esc>1 1gt
+map <Esc>2 2gt
+map <Esc>3 3gt
+map <Esc>4 4gt
+map <Esc>5 5gt
+map <Esc>6 6gt
+map <Esc>7 7gt
+map <Esc>8 8gt
+map <Esc>9 9gt
+
+"enter adds new line without entering insert mode
+map <CR> o<Esc>
+
 "no text wrapping
 set nowrap
 
@@ -41,9 +55,33 @@ set pastetoggle=<F2>
 call pathogen#runtime_append_all_bundles()
 
 "tagbar
-autocmd BufEnter * nested :call tagbar#autoopen(0)
-autocmd FileType rb,js,py,php,sh nested :TagbarOpen
+autocmd BufEnter *.py,*.rb,*.php,*.sh,*.js nested :call tagbar#autoopen(0)
 let g:tagbar_width = 40
 
+"tagbar and session compatibility fix
+"it was not possible to restore tagbar buffers after session load
+"and as a result empty buffers remained there
+"
+"we close all tagbar buffers and empty buffers after the session is restored
+"new tagbars are opened automatically due to autoopen settings above
+function! DeleteBuffers()
+    let toclose = []
+    let [i, n] = [1, bufnr('$')]
+    while i <= n
+        if bufexists(i) && (bufname(i) == '' || bufname(i) == '__Tagbar__' )
+            call add(toclose, i)
+        endif
+        let i += 1
+    endwhile
+    if len(toclose) > 0
+        exe 'bdelete' join(toclose, ' ')
+    endif
+endfunction
 
+function! MyRestoreSession()
+    OpenSession
+    call DeleteBuffers()
+endfunction
+
+command! -nargs=0 RestoreSession         call MyRestoreSession()
 
